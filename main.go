@@ -2,18 +2,29 @@ package main
 
 import (
 	"bufio"
+	"encoding/json"
 	"fmt"
+	"io"
+	"net/http"
 	"os"
 	"strings"
 )
 
-type cliCommand struct {
-	name        string
-	description string
-	callback    func() error
+type EncounterMethodRate struct{}
+type NamedAPIResource struct{}
+type PokemonEncounter struct{}
+
+type location struct {
+	id                     int32                 "json:id"
+	name                   string                "json:name"
+	game_index             int32                 "json:game_index"
+	encounter_method_rates []EncounterMethodRate "json:encounter_method_rates"
+	location               NamedAPIResource      "json:location"
+	names                  []string              "json:names"
+	pokemon_encounters     []PokemonEncounter    "json:pokemon_encounters"
 }
 
-var commands = map[string]cliCommand{
+var commands = map[string]models.cliCommand{
 	"exit": {
 		name:        "exit",
 		description: "Exit the Pokedex",
@@ -24,12 +35,19 @@ var commands = map[string]cliCommand{
 		description: "Displays a help message",
 		callback:    commandHelp,
 	},
+	"map": {
+		name:        "map",
+		description: "list towes",
+		callback:    commandMap,
+	},
 }
+
+const baseUrl = "https://pokeapi.co/api/v2/"
 
 func commandExit() error {
 	fmt.Println("Closing the Pokedex... Goodbye!")
 	os.Exit(0)
-	return fmt.Errorf("could not exit")
+	return nil
 }
 
 func commandHelp() error {
@@ -40,7 +58,26 @@ func commandHelp() error {
 	return nil
 }
 
-func getCommand(input []string) (cliCommand, error) {
+func commandMap() error {
+	url := fmt.Sprintf("%v%v", baseUrl, "")
+	res, err := http.Get(url)
+	if err != nil {
+		return fmt.Errorf("could not read %v. %w", url, err)
+	}
+	defer res.Body.Close()
+	body, err := io.ReadAll(res.Body)
+	if err != nil {
+		return fmt.Errorf("could not body. %w", err)
+	}
+	locations := location{}
+	if err := json.Unmarshal(body, &locations); err != nil {
+		fmt.Println(err)
+	}
+	fmt.Printf("locations: %v\n", locations)
+	return nil
+}
+
+func getCommand(input []string) (models.cliCommand, error) {
 	if len(input) < 1 {
 		return cliCommand{}, fmt.Errorf("no command found")
 	}
