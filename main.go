@@ -2,13 +2,11 @@ package main
 
 import (
 	"bufio"
-	"encoding/json"
 	"fmt"
-	"io"
-	"net/http"
 	"os"
 	"strings"
 
+	C "github.com/RemcoVeens/pokedex/commands"
 	M "github.com/RemcoVeens/pokedex/models"
 )
 
@@ -16,53 +14,23 @@ var commands = map[string]M.CliCommand{
 	"exit": {
 		Name:        "exit",
 		Description: "Exit the Pokedex",
-		Callback:    commandExit,
+		Callback:    C.CommandExit,
 	},
 	"help": {
 		Name:        "help",
 		Description: "Displays a help message",
-		Callback:    commandHelp,
+		Callback:    C.CommandHelp,
 	},
 	"map": {
 		Name:        "map",
-		Description: "list towes",
-		Callback:    commandMap,
+		Description: "list towns",
+		Callback:    C.CommandMap,
 	},
-}
-
-const baseUrl = "https://pokeapi.co/api/v2/"
-
-func commandExit() error {
-	fmt.Println("Closing the Pokedex... Goodbye!")
-	os.Exit(0)
-	return nil
-}
-
-func commandHelp() error {
-	fmt.Println("Welcome to the Pokedex!\nUsage:")
-	fmt.Println()
-	fmt.Println("help: Displays a help message")
-	fmt.Println("exit: Exit the Pokedex")
-	return nil
-}
-
-func commandMap() error {
-	url := fmt.Sprintf("%v%v", baseUrl, "")
-	res, err := http.Get(url)
-	if err != nil {
-		return fmt.Errorf("could not read %v. %w", url, err)
-	}
-	defer res.Body.Close()
-	body, err := io.ReadAll(res.Body)
-	if err != nil {
-		return fmt.Errorf("could not body. %w", err)
-	}
-	locations := M.Location{}
-	if err := json.Unmarshal(body, &locations); err != nil {
-		fmt.Println(err)
-	}
-	fmt.Printf("locations: %v\n", locations)
-	return nil
+	"mapb": {
+		Name:        "mapb",
+		Description: "list previus towns",
+		Callback:    C.CommandMapB,
+	},
 }
 
 func getCommand(input []string) (M.CliCommand, error) {
