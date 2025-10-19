@@ -8,37 +8,25 @@ import (
 	"net/http"
 	"os"
 	"strings"
+
+	M "github.com/RemcoVeens/pokedex/models"
 )
 
-type EncounterMethodRate struct{}
-type NamedAPIResource struct{}
-type PokemonEncounter struct{}
-
-type location struct {
-	id                     int32                 "json:id"
-	name                   string                "json:name"
-	game_index             int32                 "json:game_index"
-	encounter_method_rates []EncounterMethodRate "json:encounter_method_rates"
-	location               NamedAPIResource      "json:location"
-	names                  []string              "json:names"
-	pokemon_encounters     []PokemonEncounter    "json:pokemon_encounters"
-}
-
-var commands = map[string]models.cliCommand{
+var commands = map[string]M.CliCommand{
 	"exit": {
-		name:        "exit",
-		description: "Exit the Pokedex",
-		callback:    commandExit,
+		Name:        "exit",
+		Description: "Exit the Pokedex",
+		Callback:    commandExit,
 	},
 	"help": {
-		name:        "help",
-		description: "Displays a help message",
-		callback:    commandHelp,
+		Name:        "help",
+		Description: "Displays a help message",
+		Callback:    commandHelp,
 	},
 	"map": {
-		name:        "map",
-		description: "list towes",
-		callback:    commandMap,
+		Name:        "map",
+		Description: "list towes",
+		Callback:    commandMap,
 	},
 }
 
@@ -69,7 +57,7 @@ func commandMap() error {
 	if err != nil {
 		return fmt.Errorf("could not body. %w", err)
 	}
-	locations := location{}
+	locations := M.Location{}
 	if err := json.Unmarshal(body, &locations); err != nil {
 		fmt.Println(err)
 	}
@@ -77,17 +65,17 @@ func commandMap() error {
 	return nil
 }
 
-func getCommand(input []string) (models.cliCommand, error) {
+func getCommand(input []string) (M.CliCommand, error) {
 	if len(input) < 1 {
-		return cliCommand{}, fmt.Errorf("no command found")
+		return M.CliCommand{}, fmt.Errorf("no command found")
 	}
 	command := input[0]
 	for _, cmd := range commands {
-		if command == cmd.name {
+		if command == cmd.Name {
 			return cmd, nil
 		}
 	}
-	return cliCommand{}, fmt.Errorf("command not found")
+	return M.CliCommand{}, fmt.Errorf("command not found")
 }
 
 func cleanInput(text string) (output []string) {
@@ -111,7 +99,7 @@ func main() {
 				fmt.Printf("error: %v\n", err)
 				continue
 			}
-			command.callback()
+			command.Callback()
 
 		}
 	}
