@@ -6,11 +6,15 @@ import (
 	"io"
 	"net/http"
 	"os"
+	"time"
 
+	I "github.com/RemcoVeens/pokedex/internal"
 	M "github.com/RemcoVeens/pokedex/models"
 )
 
 const baseUrl = "https://pokeapi.co/api/v2/"
+
+var Cache = I.NewCache(5 * time.Second)
 
 func CommandExit() error {
 	fmt.Println("Closing the Pokedex... Goodbye!")
@@ -31,18 +35,27 @@ var init_number int16
 func CommandMap() error {
 	for i := init_number; i < init_number+20; i++ {
 		url := fmt.Sprintf("%v%v/%d/", baseUrl, "location-area", i+1)
-		res, err := http.Get(url)
-		if err != nil {
-			return fmt.Errorf("could not read %v. %w", url, err)
-		}
-		defer res.Body.Close()
-		body, err := io.ReadAll(res.Body)
-		if err != nil {
-			return fmt.Errorf("could not body. %w", err)
-		}
+		val, found := Cache.Get(url)
 		locations := M.LocationAreas{}
-		if err := json.Unmarshal(body, &locations); err != nil {
-			fmt.Println(err)
+		if !found {
+			res, err := http.Get(url)
+			if err != nil {
+				return fmt.Errorf("could not read %v. %w", url, err)
+			}
+			defer res.Body.Close()
+			body, err := io.ReadAll(res.Body)
+			if err != nil {
+				return fmt.Errorf("could not body. %w", err)
+			}
+			if err := json.Unmarshal(body, &locations); err != nil {
+				fmt.Println(err)
+			}
+			raw, err := json.Marshal(locations)
+			Cache.Add(url, raw)
+		} else {
+			if err := json.Unmarshal(val, &locations); err != nil {
+				fmt.Println(err)
+			}
 		}
 		fmt.Printf("%v\n", locations.Name)
 	}
