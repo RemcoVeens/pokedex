@@ -31,6 +31,11 @@ var commands = map[string]M.CliCommand{
 		Description: "list previus towns",
 		Callback:    C.CommandMapB,
 	},
+	"explore": {
+		Name:        "explore",
+		Description: "fetch info a a area on the map",
+		Callback:    C.CommandExplore,
+	},
 }
 
 func getCommand(input []string) (M.CliCommand, error) {
@@ -67,7 +72,10 @@ func main() {
 				fmt.Printf("error: %v\n", err)
 				continue
 			}
-			command.Callback()
+			err = command.Callback(cleaned...)
+			if err != nil {
+				fmt.Println(err)
+			}
 
 		}
 	}

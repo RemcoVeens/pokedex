@@ -16,13 +16,13 @@ const baseUrl = "https://pokeapi.co/api/v2/"
 
 var Cache = I.NewCache(5 * time.Second)
 
-func CommandExit() error {
+func CommandExit(args ...string) error {
 	fmt.Println("Closing the Pokedex... Goodbye!")
 	os.Exit(0)
 	return nil
 }
 
-func CommandHelp() error {
+func CommandHelp(args ...string) error {
 	fmt.Println("Welcome to the Pokedex!\nUsage:")
 	fmt.Println()
 	fmt.Println("help: Displays a help message")
@@ -32,7 +32,7 @@ func CommandHelp() error {
 
 var init_number int16
 
-func CommandMap() error {
+func CommandMap(args ...string) error {
 	for i := init_number; i < init_number+20; i++ {
 		url := fmt.Sprintf("%v%v/%d/", baseUrl, "location-area", i+1)
 		val, found := Cache.Get(url)
@@ -62,7 +62,7 @@ func CommandMap() error {
 	init_number += 20
 	return nil
 }
-func CommandMapB() error {
+func CommandMapB(args ...string) error {
 	if init_number > 40 {
 		init_number -= 20
 	} else {
@@ -72,5 +72,16 @@ func CommandMapB() error {
 	if err != nil {
 		return err
 	}
+	return nil
+}
+
+func CommandExplore(args ...string) error {
+	if len(args) == 1 {
+		return fmt.Errorf("provide a argument of a town to explore")
+	} else if len(args) > 2 {
+		return fmt.Errorf("provide just one town to explore")
+	}
+	town := args[1]
+	fmt.Printf("exploring %v\n", town)
 	return nil
 }
