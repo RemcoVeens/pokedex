@@ -25,8 +25,11 @@ func CommandExit(args ...string) error {
 func CommandHelp(args ...string) error {
 	fmt.Println("Welcome to the Pokedex!\nUsage:")
 	fmt.Println()
-	fmt.Println("help: Displays a help message")
-	fmt.Println("exit: Exit the Pokedex")
+	fmt.Println("help:          Displays a help message")
+	fmt.Println("map:           List the 20 next area's")
+	fmt.Println("mapb:          List the 20 previous area's")
+	fmt.Println("explore(area): Lists pokemon in <area>")
+	fmt.Println("exit:          Exit the Pokedex")
 	return nil
 }
 
@@ -76,12 +79,36 @@ func CommandMapB(args ...string) error {
 }
 
 func CommandExplore(args ...string) error {
+	// list's all local pokemons
 	if len(args) == 1 {
 		return fmt.Errorf("provide a argument of a town to explore")
 	} else if len(args) > 2 {
 		return fmt.Errorf("provide just one town to explore")
 	}
 	town := args[1]
-	fmt.Printf("exploring %v\n", town)
+	url := fmt.Sprintf("%v%v/%v/", baseUrl, "location-area", town)
+	locations := M.LocationAreas{}
+	val, found := Cache.Get(url)
+	if !found {
+		res, err := http.Get(url)
+		if err != nil {
+			return fmt.Errorf("could not read %v. %w", url, err)
+		}
+		defer res.Body.Close()
+		body, err := io.ReadAll(res.Body)
+		if err != nil {
+			return fmt.Errorf("could not body. %w", err)
+		}
+		if err := json.Unmarshal(body, &locations); err != nil {
+			fmt.Println(err)
+		}
+	} else {
+		if err := json.Unmarshal(val, &locations); err != nil {
+			fmt.Println(err)
+		}
+	}
+	for _, pokemon := range locations.Pokemon_encounters {
+		fmt.Println(pokemon.Pokemon.Name)
+	}
 	return nil
 }
