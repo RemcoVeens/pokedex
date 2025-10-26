@@ -68,7 +68,6 @@ type Pokemon struct {
 	Species                NamedAPIResource       `json:"species"`
 	Stats                  []PokemonStat          `json:"stats"`
 	Types                  []PokemonType          `json:"types"`
-	//
 }
 type AbilityContainer struct {
 	IsHidden bool             `json:"is_hidden"`
