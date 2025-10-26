@@ -36,6 +36,11 @@ var commands = map[string]M.CliCommand{
 		Description: "fetch info a a area on the map",
 		Callback:    C.CommandExplore,
 	},
+	"catch": {
+		Name:        "catch",
+		Description: "try to catch <pokemon>",
+		Callback:    C.CommandCatch,
+	},
 }
 
 func getCommand(input []string) (M.CliCommand, error) {

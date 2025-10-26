@@ -15,6 +15,7 @@ import (
 const baseUrl = "https://pokeapi.co/api/v2/"
 
 var Cache = I.NewCache(5 * time.Second)
+var init_number int16
 
 func CommandExit(args ...string) error {
 	fmt.Println("Closing the Pokedex... Goodbye!")
@@ -32,8 +33,6 @@ func CommandHelp(args ...string) error {
 	fmt.Println("exit:          Exit the Pokedex")
 	return nil
 }
-
-var init_number int16
 
 func CommandMap(args ...string) error {
 	for i := init_number; i < init_number+20; i++ {
@@ -110,5 +109,40 @@ func CommandExplore(args ...string) error {
 	for _, pokemon := range locations.Pokemon_encounters {
 		fmt.Println(pokemon.Pokemon.Name)
 	}
+	return nil
+}
+
+func CommandCatch(args ...string) error {
+	if len(args) == 1 {
+		return fmt.Errorf("provide a pokemon to catch")
+	} else if len(args) > 2 {
+		return fmt.Errorf("provide just one pokemon to catch")
+	}
+	pokemon := args[1]
+	fmt.Printf("Throwing a Pokeball at %v...\n", pokemon)
+	url := fmt.Sprintf("%v%v/%d/", baseUrl, "pokemon", pokemon)
+
+	locations := M.LocationAreas{}
+	if !found {
+		res, err := http.Get(url)
+		if err != nil {
+			return fmt.Errorf("could not read %v. %w", url, err)
+		}
+		defer res.Body.Close()
+		body, err := io.ReadAll(res.Body)
+		if err != nil {
+			return fmt.Errorf("could not body. %w", err)
+		}
+		if err := json.Unmarshal(body, &locations); err != nil {
+			fmt.Println(err)
+		}
+		raw, err := json.Marshal(locations)
+		Cache.Add(url, raw)
+	} else {
+		if err := json.Unmarshal(val, &locations); err != nil {
+			fmt.Println(err)
+		}
+	}
+	fmt.Printf("%v\n", locations.Name)
 	return nil
 }
