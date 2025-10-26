@@ -31,10 +31,9 @@ type Encounter struct {
 }
 type VersionEncounterDetail struct {
 	Version           NamedAPIResource `json:"version"`
-	max_chance        int32            `json:"max_chance"`
+	MaxChance         int32            `json:"max_chance"`
 	Encounter_details []Encounter      `json:"encounter_details"`
 }
-
 type PokemonEncounter struct {
 	Pokemon         NamedAPIResource         `json:"pokemon"`
 	Version_details []VersionEncounterDetail `json:"version_details"`
@@ -62,146 +61,52 @@ type Pokemon struct {
 	HeldItems              []HeldItemContainer    `json:"held_items"`
 	LocationAreaEncounters string                 `json:"location_area_encounters"`
 	Moves                  []MoveContainer        `json:"moves"`
-	Species                NamedAPIResource       `json:"species"`
-	Sprites                Sprites                `json:"sprites"`
-	Cries                  Cries                  `json:"cries"`
-	Stats                  []StatContainer        `json:"stats"`
-	Types                  []TypeContainer        `json:"types"`
 	PastTypes              []PastTypeContainer    `json:"past_types"`
 	PastAbilities          []PastAbilityContainer `json:"past_abilities"`
+	Sprites                Sprites                `json:"sprites"`
+	Cries                  Cries                  `json:"cries"`
+	Species                NamedAPIResource       `json:"species"`
+	Stats                  []PokemonStat          `json:"stats"`
+	Types                  []PokemonType          `json:"types"`
+	//
 }
-
-// AbilityContainer wraps the ability resource and related data.
 type AbilityContainer struct {
 	IsHidden bool             `json:"is_hidden"`
 	Slot     int              `json:"slot"`
 	Ability  NamedAPIResource `json:"ability"`
 }
-
-// GameIndex links a Pokemon to its index in a specific game version.
 type GameIndex struct {
 	GameIndex int              `json:"game_index"`
 	Version   NamedAPIResource `json:"version"`
 }
-
-// HeldItemContainer wraps the held item resource and version details.
 type HeldItemContainer struct {
 	Item           NamedAPIResource        `json:"item"`
 	VersionDetails []HeldItemVersionDetail `json:"version_details"`
 }
-
-// HeldItemVersionDetail provides rarity information for an item in a specific version.
 type HeldItemVersionDetail struct {
 	Rarity  int              `json:"rarity"`
 	Version NamedAPIResource `json:"version"`
 }
-
-// MoveContainer wraps the move resource and version group details.
 type MoveContainer struct {
 	Move                NamedAPIResource         `json:"move"`
 	VersionGroupDetails []MoveVersionGroupDetail `json:"version_group_details"`
 }
-
-// MoveVersionGroupDetail provides details on how a move is learned.
 type MoveVersionGroupDetail struct {
-	LevelLearnedAt  int              `json:"level_learned_at"`
-	VersionGroup    NamedAPIResource `json:"version_group"`
 	MoveLearnMethod NamedAPIResource `json:"move_learn_method"`
+	VersionGroup    NamedAPIResource `json:"version_group"`
+	LevelLearnedAt  int              `json:"level_learned_at"`
 	Order           int              `json:"order"`
 }
-
-// Sprites contains various sprite URLs for the Pokemon.
 type Sprites struct {
-	BackDefault      string       `json:"back_default"`
-	BackFemale       *string      `json:"back_female"`
-	BackShiny        string       `json:"back_shiny"`
-	BackShinyFemale  *string      `json:"back_shiny_female"`
-	FrontDefault     string       `json:"front_default"`
-	FrontFemale      *string      `json:"front_female"`
-	FrontShiny       string       `json:"front_shiny"`
-	FrontShinyFemale *string      `json:"front_shiny_female"`
-	Other            OtherSprites `json:"other"`
-	Versions         Versions     `json:"versions"`
-}
-
-// OtherSprites contains grouped sprites for specific styles.
-type OtherSprites struct {
-	DreamWorld      DreamWorldSprites      `json:"dream_world"`
-	Home            HomeSprites            `json:"home"`
-	OfficialArtwork OfficialArtworkSprites `json:"official-artwork"`
-	Showdown        ShowdownSprites        `json:"showdown"`
-}
-
-// DreamWorldSprites holds dream world style sprites.
-type DreamWorldSprites struct {
-	FrontDefault string  `json:"front_default"`
-	FrontFemale  *string `json:"front_female"`
-}
-
-// HomeSprites holds home style sprites.
-type HomeSprites struct {
 	FrontDefault     string  `json:"front_default"`
-	FrontFemale      *string `json:"front_female"`
 	FrontShiny       string  `json:"front_shiny"`
+	FrontFemale      *string `json:"front_female"`
 	FrontShinyFemale *string `json:"front_shiny_female"`
-}
-
-// OfficialArtworkSprites holds official artwork style sprites.
-type OfficialArtworkSprites struct {
-	FrontDefault string `json:"front_default"`
-	FrontShiny   string `json:"front_shiny"`
-}
-
-// ShowdownSprites holds showdown style sprites (often GIF format).
-type ShowdownSprites struct {
 	BackDefault      string  `json:"back_default"`
-	BackFemale       *string `json:"back_female"`
 	BackShiny        string  `json:"back_shiny"`
+	BackFemale       *string `json:"back_female"`
 	BackShinyFemale  *string `json:"back_shiny_female"`
-	FrontDefault     string  `json:"front_default"`
-	FrontFemale      *string `json:"front_female"`
-	FrontShiny       string  `json:"front_shiny"`
-	FrontShinyFemale *string `json:"front_shiny_female"`
 }
-
-// Versions contains sprites grouped by generation.
-type Versions struct {
-	GenerationI    GenerationI    `json:"generation-i"`
-	GenerationII   GenerationII   `json:"generation-ii"`
-	GenerationIII  GenerationIII  `json:"generation-iii"`
-	GenerationIV   GenerationIV   `json:"generation-iv"`
-	GenerationV    GenerationV    `json:"generation-v"`
-	GenerationVI   GenerationVI   `json:"generation-vi"`
-	GenerationVII  GenerationVII  `json:"generation-vii"`
-	GenerationVIII GenerationVIII `json:"generation-viii"`
-}
-
-// --- Generation-Specific Sprite Structs (Example for Gen I) ---
-// Note: Many of these sub-structs follow a similar pattern.
-
-// GenerationI holds all Generation I version sprites.
-type GenerationI struct {
-	RedBlue RedBlueSprites `json:"red-blue"`
-	Yellow  YellowSprites  `json:"yellow"`
-}
-
-// RedBlueSprites holds Red/Blue version sprites.
-type RedBlueSprites struct {
-	BackDefault  string `json:"back_default"`
-	BackGray     string `json:"back_gray"`
-	FrontDefault string `json:"front_default"`
-	FrontGray    string `json:"front_gray"`
-}
-
-// YellowSprites holds Yellow version sprites.
-type YellowSprites struct {
-	BackDefault  string `json:"back_default"`
-	BackGray     string `json:"back_gray"`
-	FrontDefault string `json:"front_default"`
-	FrontGray    string `json:"front_gray"`
-}
-
-// ... other Generation structs (GenerationII, GenerationIII, etc.) would be defined similarly ...
 
 // Cries contains the URLs for the Pokemon's cries.
 type Cries struct {
@@ -210,14 +115,14 @@ type Cries struct {
 }
 
 // StatContainer wraps a stat resource and related data.
-type StatContainer struct {
-	BaseStat int              `json:"base_stat"`
-	Effort   int              `json:"effort"`
+type PokemonStat struct {
 	Stat     NamedAPIResource `json:"stat"`
+	Effort   int              `json:"effort"`
+	BaseStat int              `json:"base_stat"`
 }
 
 // TypeContainer wraps a type resource and slot.
-type TypeContainer struct {
+type PokemonType struct {
 	Slot int              `json:"slot"`
 	Type NamedAPIResource `json:"type"`
 }
@@ -225,18 +130,17 @@ type TypeContainer struct {
 // PastTypeContainer includes type information for a past generation.
 type PastTypeContainer struct {
 	Generation NamedAPIResource `json:"generation"`
-	Types      []TypeContainer  `json:"types"`
+	Types      []PokemonType    `json:"types"`
 }
 
 // PastAbilityContainer includes ability information for a past generation.
 type PastAbilityContainer struct {
-	Generation NamedAPIResource    `json:"generation"`
-	Abilities  []PastAbilityDetail `json:"abilities"`
+	Generation NamedAPIResource `json:"generation"`
+	Abilities  []PokemonAbility `json:"abilities"`
 }
 
-// PastAbilityDetail provides details for an ability in a past generation.
-type PastAbilityDetail struct {
-	Ability  *NamedAPIResource `json:"ability"`
-	IsHidden bool              `json:"is_hidden"`
-	Slot     int               `json:"slot"`
+type PokemonAbility struct {
+	IsHidden bool             `json:"is_hidden"`
+	Slot     int32            `json:"slot"`
+	Ability  NamedAPIResource `json:"ablilty"`
 }

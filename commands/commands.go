@@ -120,8 +120,8 @@ func CommandCatch(args ...string) error {
 	}
 	pokemon := args[1]
 	fmt.Printf("Throwing a Pokeball at %v...\n", pokemon)
-	url := fmt.Sprintf("%v%v/%d/", baseUrl, "pokemon", pokemon)
-
+	url := fmt.Sprintf("%v%v/%v/", baseUrl, "pokemon", pokemon)
+	val, found := Cache.Get(url)
 	locations := M.LocationAreas{}
 	if !found {
 		res, err := http.Get(url)
